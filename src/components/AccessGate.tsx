@@ -1,11 +1,36 @@
 // src/components/AccessGate.tsx
 import { useState, useEffect, useRef } from 'react';
-import { BookOpen, Lock, MessageCircle, AlertCircle, Loader2, ShoppingCart, Phone } from 'lucide-react';
+import { 
+  BookOpen, Lock, MessageCircle, AlertCircle, Loader2, 
+  ShoppingCart, FileText 
+} from 'lucide-react';
 import { verifyAccessCode, isAdminCode } from '../lib/supabase';
+import { chapter1 } from '../data/chapter1';
+import { chapter2 } from '../data/chapter2';
+import { chapter3 } from '../data/chapter3';
+import { chapter4 } from '../data/chapter4';
+import { chapter5 } from '../data/chapter5';
+import { chapter6 } from '../data/chapter6';
+import { chapter7 } from '../data/chapter7';
+import { chapter8 } from '../data/chapter8';
+import { chapter9 } from '../data/chapter9';
 
 interface Props {
   onAccessGranted: (code: string) => void;
 }
+
+// Regrouper tous les chapitres dans un tableau
+const chapters = [
+  chapter1,
+  chapter2,
+  chapter3,
+  chapter4,
+  chapter5,
+  chapter6,
+  chapter7,
+  chapter8,
+  chapter9
+];
 
 export default function AccessGate({ onAccessGranted }: Props) {
   const [code, setCode] = useState('');
@@ -13,21 +38,19 @@ export default function AccessGate({ onAccessGranted }: Props) {
   const [error, setError] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Numéro WhatsApp du support (à modifier avec votre numéro)
-  const WHATSAPP_NUMBER = '778677650'; // Mettez votre numéro ici (sans le +)
+  // Numéro WhatsApp du support
+  const WHATSAPP_NUMBER = '778677650';
   
-  // Message WhatsApp pour la demande de paiement
   const WHATSAPP_MESSAGE = `Bonjour, je souhaite acheter l'accès au "Guide Négociation Master". 
   
 Je suis prêt à procéder au paiement. Veuillez m'envoyer le lien de paiement.
 
-
-
 Merci !`;
 
-  // Auto-focus avec gestion d'erreur
+  // Auto-focus
   useEffect(() => {
     try {
       if (inputRef.current) {
@@ -38,7 +61,7 @@ Merci !`;
     }
   }, []);
 
-  // Vérifier si le code est admin en temps réel
+  // Vérifier si le code est admin
   useEffect(() => {
     if (code.trim()) {
       setIsAdmin(isAdminCode(code));
@@ -90,7 +113,7 @@ Merci !`;
     }
   };
 
-  // Ouvrir WhatsApp avec le message pré-rempli
+  // Ouvrir WhatsApp
   const openWhatsApp = () => {
     const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE);
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
@@ -98,7 +121,6 @@ Merci !`;
     setShowPaymentModal(false);
   };
 
-  // Ouvrir WhatsApp pour le support
   const openSupportWhatsApp = () => {
     const supportMessage = encodeURIComponent(
       `Bonjour, j'ai besoin d'aide concernant l'accès au "Guide Négociation Master".`
@@ -107,9 +129,231 @@ Merci !`;
     window.open(url, '_blank');
   };
 
+  // ── Téléchargement du guide ──────────────────────────────────────────────
+  const downloadEbook = () => {
+    setDownloading(true);
+    try {
+      // Générer le contenu HTML du guide
+      let html = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide Négociation Master</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #fafafa;
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 50px 30px;
+    }
+    .cover {
+      text-align: center;
+      padding: 60px 20px 40px;
+      border-bottom: 3px solid #b8860b;
+      margin-bottom: 50px;
+    }
+    .cover-title {
+      font-size: 42px;
+      font-weight: bold;
+      color: #b8860b;
+      margin-bottom: 15px;
+    }
+    .cover-subtitle {
+      font-size: 20px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .cover-meta {
+      font-size: 14px;
+      color: #999;
+    }
+    .toc {
+      margin: 40px 0 50px;
+      padding: 30px;
+      background: #f5f0e8;
+      border-radius: 12px;
+    }
+    .toc-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #b8860b;
+    }
+    .toc-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px dashed #ddd;
+      font-size: 16px;
+    }
+    .toc-item:last-child { border-bottom: none; }
+    .chapter {
+      margin-bottom: 50px;
+      page-break-after: always;
+    }
+    .chapter:last-child { page-break-after: auto; }
+    .chapter-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #1a1a1a;
+      margin-bottom: 10px;
+      border-left: 5px solid #b8860b;
+      padding-left: 20px;
+    }
+    .chapter-meta {
+      font-size: 14px;
+      color: #999;
+      margin-bottom: 25px;
+      padding-left: 25px;
+    }
+    .chapter-content {
+      font-size: 17px;
+      line-height: 1.9;
+    }
+    .chapter-content p {
+      margin-bottom: 18px;
+      text-align: justify;
+    }
+    .key-points {
+      background: #f5f0e8;
+      padding: 20px 25px;
+      border-radius: 8px;
+      margin: 20px 0 30px;
+      border-left: 5px solid #b8860b;
+    }
+    .key-points-title {
+      font-weight: bold;
+      color: #b8860b;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .key-points ul {
+      list-style: none;
+      padding: 0;
+    }
+    .key-points li {
+      padding: 6px 0 6px 28px;
+      position: relative;
+    }
+    .key-points li:before {
+      content: "✦";
+      color: #b8860b;
+      position: absolute;
+      left: 0;
+      font-size: 14px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 13px;
+      color: #999;
+      border-top: 2px solid #ddd;
+      padding-top: 30px;
+      margin-top: 50px;
+    }
+    @media print {
+      body { background: white; padding: 20px; }
+      .chapter { page-break-after: always; }
+      .chapter:last-child { page-break-after: auto; }
+    }
+    @media (max-width: 600px) {
+      body { padding: 20px 15px; }
+      .cover-title { font-size: 28px; }
+      .chapter-title { font-size: 22px; }
+      .toc-item { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cover">
+    <div class="cover-title">📖 Guide Négociation Master</div>
+    <div class="cover-subtitle">Transformez vos relations, boostez votre vie</div>
+    <div class="cover-meta">
+      <p>${chapters.length} chapitres · ${new Date().getFullYear()}</p>
+      <p style="margin-top:10px;font-size:12px;color:#bbb;">Guide offert - Partagez-le avec vos proches</p>
+    </div>
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">📚 Sommaire</div>
+    ${chapters.map((ch, i) => `
+      <div class="toc-item">
+        <span>${i+1}. ${ch.title}</span>
+        <span style="color:#999;">Page ${ch.pageNumber}</span>
+      </div>
+    `).join('')}
+  </div>
+`;
+
+      // Ajouter chaque chapitre
+      chapters.forEach((ch) => {
+        // Traiter le contenu pour préserver les sauts de ligne et les emojis
+        const contentHtml = ch.content
+          .split('\n\n')
+          .map(para => {
+            if (para.trim().startsWith('▌') || para.trim().startsWith('⬇') || para.trim().startsWith('━━')) {
+              return `<div style="font-weight:bold;margin:20px 0 10px;color:#b8860b;">${para.trim()}</div>`;
+            }
+            return `<p>${para.trim()}</p>`;
+          })
+          .join('');
+
+        html += `
+  <div class="chapter">
+    <div class="chapter-title">${ch.title}</div>
+    <div class="chapter-meta">Page ${ch.pageNumber}</div>
+    ${ch.keyPoints ? `
+    <div class="key-points">
+      <div class="key-points-title">✨ Points clés</div>
+      <ul>
+        ${ch.keyPoints.map(pt => `<li>${pt}</li>`).join('')}
+      </ul>
+    </div>
+    ` : ''}
+    <div class="chapter-content">
+      ${contentHtml}
+    </div>
+  </div>
+`;
+      });
+
+      html += `
+  <div class="footer">
+    <p>Guide Négociation Master © ${new Date().getFullYear()} · Tous droits réservés</p>
+    <p style="margin-top:10px;font-size:12px;">Ce guide est offert gratuitement. Partagez-le autour de vous !</p>
+  </div>
+</body>
+</html>`;
+
+      // Créer le fichier
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Guide-Negociation-Master.html`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error('Erreur de téléchargement:', error);
+      alert('Une erreur est survenue. Veuillez réessayer.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center px-4">
-      {/* Background subtle pattern */}
+      {/* Background pattern */}
       <div 
         className="absolute inset-0 opacity-5 pointer-events-none"
         style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}
@@ -223,8 +467,36 @@ Merci !`;
             Acheter l'accès
           </button>
 
+          {/* ── BOUTON DE TÉLÉCHARGEMENT GRATUIT ────────────────────────── */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-2 bg-transparent text-slate-500">ou</span>
+            </div>
+          </div>
+
+          <button
+            onClick={downloadEbook}
+            disabled={downloading}
+            className="w-full py-3.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-400 font-bold text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {downloading ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                Téléchargement...
+              </>
+            ) : (
+              <>
+                <FileText size={18} />
+                Télécharger le guide (gratuit)
+              </>
+            )}
+          </button>
+
           <p className="mt-3 text-xs text-center text-slate-500">
-            💳 Paiement sécurisé · Code unique par appareil
+            📚 Version complète · 9 chapitres · Lisible sur tous les appareils
           </p>
 
           {/* Indicateur de code admin */}

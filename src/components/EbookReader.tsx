@@ -5,7 +5,15 @@ import {
   Minus, Plus, Bookmark, Share2, Search, Settings,
   Maximize, Minimize, List, ArrowUp, LogOut, CheckCircle, Shield,
 } from 'lucide-react';
-import { chapters } from '../data/chapters';
+import { chapter1 } from '../data/chapter1';
+import { chapter2 } from '../data/chapter2';
+import { chapter3 } from '../data/chapter3';
+import { chapter4 } from '../data/chapter4';
+import { chapter5 } from '../data/chapter5';
+import { chapter6 } from '../data/chapter6';
+import { chapter7 } from '../data/chapter7';
+import { chapter8 } from '../data/chapter8';
+import { chapter9 } from '../data/chapter9';
 import { BookmarkItem } from '../types';
 import { fetchBookmarks, addBookmark, removeBookmark, isAdminCode } from '../lib/supabase';
 import AdminPanel from './AdminPanel';
@@ -14,6 +22,19 @@ interface Props {
   accessCode: string;
   onLogout: () => void;
 }
+
+// Regrouper tous les chapitres dans un tableau
+const chapters = [
+  chapter1,
+  chapter2,
+  chapter3,
+  chapter4,
+  chapter5,
+  chapter6,
+  chapter7,
+  chapter8,
+  chapter9
+];
 
 export default function EbookReader({ accessCode, onLogout }: Props) {
   const [currentChapter, setCurrentChapter] = useState(0);
@@ -221,6 +242,32 @@ export default function EbookReader({ accessCode, onLogout }: Props) {
   const hover    = darkMode ? 'hover:bg-slate-700' : 'hover:bg-stone-100';
   const active   = darkMode ? 'bg-slate-700'    : 'bg-stone-100';
 
+  // Formater le contenu avec les styles appropriés
+  const formatContent = (content: string) => {
+    return content.split('\n\n').map((paragraph, index) => {
+      // Détecter les titres avec ▌ ou ⬇
+      if (paragraph.trim().startsWith('▌') || paragraph.trim().startsWith('⬇')) {
+        return (
+          <div key={index} className="text-amber-400 font-bold text-lg mt-8 mb-4">
+            {paragraph.trim()}
+          </div>
+        );
+      }
+      // Détecter les séparateurs
+      if (paragraph.trim().startsWith('━━')) {
+        return (
+          <hr key={index} className="border-amber-500/30 my-6" />
+        );
+      }
+      // Paragraphe normal
+      return (
+        <p key={index} className="mb-4 text-justify">
+          {paragraph.trim()}
+        </p>
+      );
+    });
+  };
+
   return (
     <div className={`min-h-screen ${bg} ${txt} transition-colors duration-300 select-none`}>
 
@@ -338,7 +385,7 @@ export default function EbookReader({ accessCode, onLogout }: Props) {
       <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
         <div className={`absolute left-0 top-0 bottom-0 w-80 ${bar} shadow-2xl transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}>
-          <div className={`p-5 border-b ${border} flex items-center justify-between`}>
+          <div className={`p-5 border-b ${border} flex items-between justify-between`}>
             <div className="flex items-center gap-2">
               <BookOpen size={18} className="text-amber-500" />
               <span className="font-semibold text-sm">Sommaire</span>
@@ -466,14 +513,10 @@ export default function EbookReader({ accessCode, onLogout }: Props) {
             )}
           </div>
 
-          {/* Chapter body */}
+          {/* Chapter body - avec formatage spécial pour les titres */}
           <div className="p-8 sm:p-12">
             <div className={`${fontFamily}`} style={{ fontSize: `${fontSize}px`, lineHeight }}>
-              {chapters[currentChapter].content.split('\n\n').map((para, idx) => (
-                <p key={idx} className="mb-6 text-justify">
-                  {para}
-                </p>
-              ))}
+              {formatContent(chapters[currentChapter].content)}
             </div>
           </div>
 
