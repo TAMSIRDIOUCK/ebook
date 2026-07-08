@@ -4,7 +4,7 @@ import {
   BookOpen, Lock, MessageCircle, AlertCircle, Loader2, 
   ShoppingCart, FileText 
 } from 'lucide-react';
-import { verifyAccessCode, isAdminCode } from '../lib/supabase';
+import { verifyAccessCode } from '../lib/supabase';
 import { chapter1 } from '../data/chapter1';
 import { chapter2 } from '../data/chapter2';
 import { chapter3 } from '../data/chapter3';
@@ -36,7 +36,6 @@ export default function AccessGate({ onAccessGranted }: Props) {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -59,15 +58,6 @@ Merci !`;
       console.warn('Focus failed:', error);
     }
   }, []);
-
-  // Vérifier si le code est admin
-  useEffect(() => {
-    if (code.trim()) {
-      setIsAdmin(isAdminCode(code));
-    } else {
-      setIsAdmin(false);
-    }
-  }, [code]);
 
   const handleSubmit = async () => {
     const trimmedCode = code.trim();
@@ -151,12 +141,6 @@ Merci !`;
             Entrez votre code d'accès pour continuer.
           </p>
           
-          {isAdmin && (
-            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              Mode Admin activé
-            </div>
-          )}
         </div>
 
         {/* Card */}
@@ -177,26 +161,11 @@ Merci !`;
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder="Ex : GNM-2024-XXXXX"
-                className={`w-full px-4 py-3.5 rounded-xl bg-white/10 border ${
-                  isAdmin 
-                    ? 'border-emerald-500/50 focus:ring-emerald-500' 
-                    : 'border-white/20 focus:ring-amber-500'
-                } text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all font-mono text-base tracking-widest`}
+                className="w-full px-4 py-3.5 rounded-xl bg-white/10 border border-white/20 focus:ring-amber-500 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all font-mono text-base tracking-widest"
                 maxLength={30}
                 disabled={loading}
               />
-              {isAdmin && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
-                </div>
-              )}
             </div>
-            {isAdmin && (
-              <p className="mt-2 text-xs text-emerald-400/80 flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-emerald-400 inline-block"></span>
-                Code administrateur détecté
-              </p>
-            )}
           </div>
 
           {/* Error message */}
@@ -210,11 +179,7 @@ Merci !`;
           <button
             onClick={handleSubmit}
             disabled={loading || !code.trim()}
-            className={`w-full py-3.5 rounded-xl font-bold text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 ${
-              isAdmin
-                ? 'bg-emerald-500 hover:bg-emerald-400 text-white'
-                : 'bg-amber-500 hover:bg-amber-400 text-slate-900'
-            } disabled:opacity-40 disabled:cursor-not-allowed`}
+            className="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -222,7 +187,7 @@ Merci !`;
                 Vérification…
               </>
             ) : (
-              isAdmin ? '🚀 Accès Admin' : 'Accéder au guide'
+              'Accéder au guide'
             )}
           </button>
 
@@ -252,16 +217,6 @@ Merci !`;
               📚 Version complète · 9 chapitres · Lisible sur tous les appareils
             </p>
 
-          {/* Indicateur de code admin */}
-          <div className="mt-4 text-center">
-            <p className="text-xs text-slate-500/50">
-              {isAdmin ? (
-                '⚡ Accès administrateur accordé'
-              ) : (
-                '💡 Code admin: ADMIN2026'
-              )}
-            </p>
-          </div>
         </div>
 
         {/* WhatsApp hint - support */}
