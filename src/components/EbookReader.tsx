@@ -3,8 +3,9 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   ChevronLeft, ChevronRight, Menu, X, BookOpen, Moon, Sun,
   Minus, Plus, Bookmark, Share2, Search, Settings,
-  Maximize, Minimize, List, ArrowUp, LogOut, CheckCircle, Shield,
+  Maximize, Minimize, List, ArrowUp, LogOut, CheckCircle, Shield, FileText,
 } from 'lucide-react';
+import { downloadGuide } from '../lib/guideDownload';
 import { chapter1 } from '../data/chapter1';
 import { chapter2 } from '../data/chapter2';
 import { chapter3 } from '../data/chapter3';

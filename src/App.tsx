@@ -2,6 +2,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import AccessGate from './components/AccessGate';
 import EbookReader from './components/EbookReader';
+import InstallPrompt from './components/InstallPrompt';
 
 const STORAGE_KEY = 'gnm_access_code';
 
@@ -92,6 +93,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
+      <InstallPrompt />
       <Suspense fallback={<LoadingFallback />}>
         {!accessCode ? (
           <AccessGate onAccessGranted={handleAccessGranted} />
