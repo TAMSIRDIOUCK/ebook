@@ -2,8 +2,6 @@ const CACHE_NAME = 'pwa-cache-v1';
 const CORE_ASSETS = [
   '/',
   '/index.html',
-  '/src/main.tsx',
-  '/src/index.css',
   '/manifest.webmanifest',
   '/icons/icon-192.svg',
   '/icons/icon-512.svg'
