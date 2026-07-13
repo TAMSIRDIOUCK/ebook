@@ -207,7 +207,7 @@ Merci !`;
               className="w-full py-3.5 rounded-xl bg-green-600 hover:bg-green-500 text-white font-bold text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
             >
               <ShoppingCart size={18} />
-              Acheter l'accès maintenant
+              Acheter l'E-BOOK A 5000F
             </button>
 
             <p className="mt-4 text-sm text-center text-slate-300">
